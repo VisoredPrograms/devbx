@@ -43,21 +43,11 @@ function module.init()
 	local placeId = process.env.PLACE_ID
 	assert(placeId, "Attempted action aborted — missing required place id.")
 
-	print("Preparing to build the project.")
-
 	module.download(placeId)
 	module.dump(placeId)
 
 	process.exec("rojo", { "build -o game.rbxl" })
 	process.exec("asphalt", { "sync" })
-
-	print("Built project!")
-
-	local command = (process.os == "windows") and "explorer" or "open"
-	local result = process.exec(command, { "game.rbxl" })
-
-	assert(result.stderr, `Attempted action failed — Error: {result.stderr}`)
-	print(result.stdout)
 end
 
 -- Main execution
