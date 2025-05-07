@@ -46,8 +46,21 @@ function module.init()
 	module.download(placeId)
 	module.dump(placeId)
 
-	process.exec("rojo", { "build -o game.rbxl" })
-	process.exec("asphalt", { "sync" })
+	local rojo_response = process.exec("rojo", { "build -o game.rbxl" })
+
+	assert(rojo_response.stderr, `Attempted action failed — Error: {rojo_response.stderr}`)
+
+	if rojo_response.stdout then
+		print(rojo_response.stdout)
+	end
+
+	local asphalt_response = process.exec("asphalt", { "sync" })
+
+	assert(asphalt_response.stderr, `Attempted action failed — Error: {asphalt_response.stderr}`)
+
+	if asphalt_response.stdout then
+		print(asphalt_response.stdout)
+	end
 end
 
 -- Main execution
