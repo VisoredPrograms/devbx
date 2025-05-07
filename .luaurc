@@ -1,0 +1,15 @@
+{
+    "languageMode": "strict",
+    "lint": {
+        "*": true
+    },
+    "lintErrors": true,
+    "typeErrors": true,
+    "globals": [],
+    "aliases": {
+        "client": "src/client",
+        "server": "src/server",
+        "shared": "src/shared",
+        "lune": "~/.lune/.typedefs/0.9.3/"
+    }
+}
