@@ -9,8 +9,10 @@ function module.spawn(program: string, params: { string }, options: process.Exec
 	local response = process.exec(program, params, options)
 
 	if response.stderr and response.stderr ~= "" then
-		error(`Attempted action failed — Error: {response.stderr}`)
-	else
+		warn(response.stderr)
+	end
+
+	if response.stdout and response.stdout ~= "" then
 		print(response.stdout)
 	end
 
