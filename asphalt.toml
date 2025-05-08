@@ -7,7 +7,7 @@ type = "user"
 id = 1 # replace with your id
 
 [codegen]
-output_name = "assets"
+output_name = "init"
 typescript = false
 style = "nested"
 strip_extension = true
