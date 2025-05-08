@@ -6,6 +6,7 @@ local process = require("@lune/process")
 local roblox = require("@lune/roblox")
 
 -- Modules
+local helper = require("./lib/helper")
 local remodel = require("./lib/remodel")
 local dotenv = require("./lib/dotenv")
 dotenv.init()
@@ -46,21 +47,8 @@ function module.init()
 	module.download(placeId)
 	module.dump(placeId)
 
-	local rojo_response = process.exec("rojo", { "build -o game.rbxl" })
-
-	assert(rojo_response.stderr, `Attempted action failed — Error: {rojo_response.stderr}`)
-
-	if rojo_response.stdout then
-		print(rojo_response.stdout)
-	end
-
-	local asphalt_response = process.exec("asphalt", { "sync" })
-
-	assert(asphalt_response.stderr, `Attempted action failed — Error: {asphalt_response.stderr}`)
-
-	if asphalt_response.stdout then
-		print(asphalt_response.stdout)
-	end
+	helper.spawn("rojo", { "build", "-o", "game.rbxl" })
+	helper.spawn("asphalt", { "sync" })
 end
 
 -- Main execution
