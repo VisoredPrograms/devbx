@@ -7,8 +7,16 @@ local ENV_PATH = "./.env"
 local fs = require("@lune/fs")
 local process = require("@lune/process")
 
+-- Variables
+local Terminated = false
+
 -- Reads the .env file and loads key-value pairs into the store table.
 function module.init(): ()
+	if Terminated then
+		warn("Attempted action aborted — process has already been initialized")
+		return
+	end
+
 	local isFile = fs.isFile(ENV_PATH)
 	assert(isFile, "Attempted action aborted — could not find file.")
 
@@ -30,6 +38,8 @@ function module.init(): ()
 		value = value:gsub('^%s*"?(.-)"?%s*$', "%1")
 		process.env[key] = value
 	end
+
+	Terminated = true
 end
 
 return module

@@ -1,6 +1,10 @@
 # Environment variables
 /*.env
 
+# Tree (paths)
+/assets
+/map
+
 # Argon
 /sourcemap.json
 
@@ -12,6 +16,7 @@
 # Artifacts
 /*.lock
 /*.rbxl
+/*.rbxl.lock
 /*.rbxlx
 /*.rbxm
 /*.rbxmx
