@@ -1,13 +1,10 @@
 -- API References
 local fs = require("@lune/fs")
--- local process = require("@lune/process")
 local roblox = require("@lune/roblox")
 local serde = require("@lune/serde")
 
--- Modules
-local helper = require("./lib/helper")
-
--- Constants
+-- References
+local helper = require("./modules/helper")
 local env = serde.decode("toml", fs.readFile("./.env"))
 
 -- Variables

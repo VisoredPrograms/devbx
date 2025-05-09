@@ -2,8 +2,8 @@
 /*.env
 
 # Tree (paths)
-/assets
 /map
+/assets
 
 # Argon
 /sourcemap.json
