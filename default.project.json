@@ -1,43 +1,23 @@
 {
     "name": "project",
+    "globIgnorePaths": ["**/*.spec.lua"],
     "tree": {
         "$className": "DataModel",
-
-        "ReplicatedStorage": {
-            "Shared": {
-                "$path": "src/shared"
-            },
-            "Assets": {
-                "$path": "assets"
-            }
-        },
-
-        "ServerScriptService": {
-            "Server": {
-                "$path": "src/server"
-            }
-        },
-
         "StarterPlayer": {
-            "StarterPlayerScripts": {
-                "Client": {
-                    "$path": "src/client"
-                }
-            }
+            "$className": "StarterPlayer",
+            "$path": "src/client"
         },
-
-        "Workspace": {
-            "$path": "map/Workspace.rbxm"
+        "ReplicatedStorage": {
+            "$className": "ReplicatedStorage",
+            "$path": "src/shared"
         },
-
-        "Lighting": {
-            "$path": "map/Lighting.rbxm"
+        "ServerScriptService": {
+            "$className": "ServerScriptService",
+            "$path": "src/server"
         },
-
-        "SoundService": {
-            "$properties": {
-                "RespectFilteringEnabled": true
-            }
+        "ServerStorage": {
+            "$className": "ServerStorage",
+            "$path": "src/server"
         }
     }
 }

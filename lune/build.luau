@@ -11,6 +11,59 @@ local remodel = require("./modules/remodel")
 -- dotenv.init()
 local env = serde.decode("toml", fs.readFile("./.env"))
 
+-- Helpers
+
+-- Ensures the required directory structure exists under ./src.
+function module.mkdirs(directories: { string }): ()
+	for _, dir in directories do
+		if fs.isDir(dir) then
+			-- print(`Directory structure validated — dir, \"{dir}\", already exists.`)
+			continue
+		end
+
+		fs.writeDir(dir)
+	end
+end
+
+local function exportScripts(container: Instance, path: string): ()
+	for _, object in ipairs(container:GetDescendants()) do
+		-- Skip non-script objects
+		if not (object:IsA("Script") or object:IsA("ModuleScript") or object:IsA("LocalScript")) then
+			continue
+		end
+
+		-- Check if this script has any child scripts
+		local Pregnant = false
+		for _, child in ipairs(object:GetChildren()) do
+			if child:IsA("Script") or child:IsA("ModuleScript") or child:IsA("LocalScript") then
+				Pregnant = true
+				break
+			end
+		end
+
+		local dir = `./src/{path}`
+		local filePath: string
+
+		if Pregnant then
+			-- If it has script children, create a folder with `init.luau`
+			filePath = `{dir}/{object.Name}/init.luau`
+			fs.writeDir(`{dir}/{object.Name}`)
+		else
+			-- If no script children, save directly as `ScriptName.luau`
+			filePath = `{dir}/{object.Name}.luau`
+		end
+
+		fs.writeFile(filePath, object.Source)
+
+		-- Recursively export child scripts (if any)
+		if Pregnant then
+			exportScripts(object, `{path}/{object.Name}`)
+		end
+	end
+end
+
+-- Functions
+
 -- Downloads a Roblox place by ID, extracts key services, and writes them to disk.
 -- `module.dump` or `module.export`
 function module.dump(placeId: number | string): ()
@@ -18,19 +71,17 @@ function module.dump(placeId: number | string): ()
 	local content = remodel.download(placeId)
 	local game: any = roblox.deserializePlace(content)
 
-	-- Ensure necessary directories exist
-	if not fs.isDir("./assets") then
-		fs.writeDir("./assets")
-	end
-
 	-- Services
-	local workspace = game:GetService("Workspace")
+	local StarterPlayer = game:GetService("StarterPlayer")
+	local ReplicatedStorage = game:GetService("ReplicatedStorage")
+	local ServerScriptService = game:GetService("ServerScriptService")
+	local ServerStorage = game:GetService("ServerStorage")
 
 	-- Main execution
-	for _, object in workspace:GetChildren() do
-		local file = roblox.serializeModel({ object })
-		fs.writeFile("./assets/" .. object.Name, file)
-	end
+	exportScripts(StarterPlayer, "client")
+	exportScripts(ReplicatedStorage, "shared")
+	exportScripts(ServerScriptService, "server")
+	exportScripts(ServerStorage, "server")
 end
 
 -- Downloads the raw place file and saves it to disk.
@@ -44,16 +95,24 @@ function module.init(output: string)
 	local placeId = env.PLACE_ID
 	assert(placeId, "Set up aborted — missing required place id.")
 
-	module.download(placeId, output)
-	-- module.dump(placeId)
+	local directories = {
+		"./src",
+		"./src/client",
+		"./src/shared",
+		"./src/server",
+	}
+	module.mkdirs(directories)
+
+	-- module.download(placeId, output)
+	module.dump(placeId)
 
 	helper.spawn(
 		"rojo",
-		{ "sourcemap", "--output", "./sourcemap.json", "--include-non-scripts", "./default.project.json" },
+		{ "sourcemap", "--output", "./sourcemap.json", "--include-non-scripts", "default.project.json" },
 		{ stdio = "forward" }
 	)
 	-- helper.spawn("asphalt", { "sync", "--target", "studio" }, { stdio = "forward" })
-	helper.spawn("rojo", { "build", "--output", `./{output}.rbxl`, "./default.project.json" }, { stdio = "forward" })
+	helper.spawn("rojo", { "build", "--output", `./{output}.rbxl`, "default.project.json" }, { stdio = "forward" })
 end
 
 -- Main execution
