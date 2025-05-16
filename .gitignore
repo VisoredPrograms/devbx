@@ -2,6 +2,7 @@
 /*.env
 
 # Tree (paths)
+/src
 /map
 /assets
 
