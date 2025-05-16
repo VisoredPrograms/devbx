@@ -93,7 +93,7 @@ end
 -- Downloads and saves the place, assets, and game file.
 function module.init(output: string)
 	local placeId = env.PLACE_ID
-	assert(placeId, "Set up aborted — missing required place id.")
+	assert(placeId, "(!!) Could not get 'place-id' (expected type: number | string).")
 
 	local directories = {
 		"./src",
@@ -116,6 +116,6 @@ function module.init(output: string)
 end
 
 -- Main execution
-module.init(env.OUTPUT_NAME)
+module.init(env.OUTPUT_NAME or "game")
 
 return module

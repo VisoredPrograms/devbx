@@ -30,7 +30,7 @@ function module.getCookie(): string
 		end
 	end
 
-	error("(!!) Could not find 'auth-cookie' in workspace.")
+	error("(!!) Could not find 'auth-cookie' in workspace (expected type: string)")
 end
 
 -- Main Functions
@@ -58,14 +58,14 @@ function module.download(assetId: number | string): string
 	-- Make sure we got a valid response body
 	local content = serde.decode("json", api_response.body)
 	if type(content) ~= "table" or type(content.locations) ~= "table" then
-		error("(!!) Could not fetch a valid 'response-body'.")
+		error("(!!) Could not fetch a valid 'response-body' (expected type: table).")
 	end
 
 	-- Grab the first asset download location - we only
 	-- requested one in our query, so this will be correct
 	local path = content.locations[1]
 	if type(path) ~= "table" or type(path.location) ~= "string" then
-		error("(!!) Could not find any suitable paths.")
+		error("(!!) Could not find any suitable paths (expected type: table)")
 	end
 
 	-- Fetch the place contents from the CDN
