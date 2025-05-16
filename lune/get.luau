@@ -9,10 +9,10 @@ local env = serde.decode("toml", fs.readFile("./.env"))
 
 -- Variables
 local isFile = fs.isFile(`./{env.OUTPUT_NAME}.rbxl`)
-assert(isFile, "Attempted action failed — missing required game file.")
+assert(isFile, "(!!) Could not find 'game'.")
 
 -- Main execution
-print("Attempted action successful — starting game.")
+print("(!) Processing 'game'. Stay patient.")
 
 local command = roblox.studioApplicationPath() -- (process.os == "windows") and "explorer" or "open"
 helper.spawn(command, { `./{env.OUTPUT_NAME}.rbxl` })

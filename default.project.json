@@ -1,23 +1,55 @@
 {
-    "name": "project",
-    "globIgnorePaths": ["**/*.spec.lua"],
-    "tree": {
-        "$className": "DataModel",
-        "StarterPlayer": {
-            "$className": "StarterPlayer",
-            "$path": "src/client"
-        },
-        "ReplicatedStorage": {
-            "$className": "ReplicatedStorage",
-            "$path": "src/shared"
-        },
-        "ServerScriptService": {
-            "$className": "ServerScriptService",
-            "$path": "src/server"
-        },
-        "ServerStorage": {
-            "$className": "ServerStorage",
-            "$path": "src/server"
-        }
+  "name": "project",
+  "tree": {
+    "$className": "DataModel",
+    "ReplicatedFirst": {
+      "$className": "ReplicatedFirst",
+      "$ignoreUnknownInstances": true,
+      "$path": "src/ReplicatedFirst"
+    },
+    "ReplicatedStorage": {
+      "$className": "ReplicatedStorage",
+      "$ignoreUnknownInstances": true,
+      "$path": "src/ReplicatedStorage"
+    },
+    "ServerScriptService": {
+      "$className": "ServerScriptService",
+      "$ignoreUnknownInstances": true,
+      "$path": "src/ServerScriptService"
+    },
+    "ServerStorage": {
+      "$className": "ServerStorage",
+      "$ignoreUnknownInstances": true,
+      "$path": "src/ServerStorage"
+    },
+    "StarterGui": {
+      "$className": "StarterGui",
+      "$ignoreUnknownInstances": true,
+      "$path": "src/StarterGui"
+    },
+    "StarterPlayer": {
+      "$className": "StarterPlayer",
+      "StarterCharacterScripts": {
+        "$className": "StarterCharacterScripts",
+        "$ignoreUnknownInstances": true,
+        "$path": "src/StarterPlayer/StarterCharacterScripts"
+      },
+      "StarterPlayerScripts": {
+        "$className": "StarterPlayerScripts",
+        "$ignoreUnknownInstances": true,
+        "$path": "src/StarterPlayer/StarterPlayerScripts"
+      },
+      "$ignoreUnknownInstances": true
+    },
+    "TestService": {
+      "$className": "TestService",
+      "$ignoreUnknownInstances": true,
+      "$path": "src/TestService"
+    },
+    "Workspace": {
+      "$className": "Workspace",
+      "$ignoreUnknownInstances": true,
+      "$path": "src/Workspace"
     }
+  }
 }

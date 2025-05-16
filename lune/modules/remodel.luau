@@ -30,7 +30,7 @@ function module.getCookie(): string
 		end
 	end
 
-	error("Attempted action aborted — missing required auth cookie.")
+	error("(!!) Could not find 'auth-cookie' in workspace.")
 end
 
 -- Main Functions
@@ -52,20 +52,20 @@ function module.download(assetId: number | string): string
 
 	assert(
 		api_response.ok,
-		`API request aborted: {api_response.statusCode} — {api_response.statusMessage}: {api_response.body}`
+		`(!!) Could not complete 'api-request': {api_response.statusCode} — {api_response.statusMessage}: {api_response.body}`
 	)
 
 	-- Make sure we got a valid response body
 	local content = serde.decode("json", api_response.body)
 	if type(content) ~= "table" or type(content.locations) ~= "table" then
-		error("API request aborted — returned an invalid response body.")
+		error("(!!) Could not fetch a valid 'response-body'.")
 	end
 
 	-- Grab the first asset download location - we only
 	-- requested one in our query, so this will be correct
 	local path = content.locations[1]
 	if type(path) ~= "table" or type(path.location) ~= "string" then
-		error("API request aborted — returned no suitable paths.")
+		error("(!!) Could not find any suitable paths.")
 	end
 
 	-- Fetch the place contents from the CDN
@@ -78,7 +78,7 @@ function module.download(assetId: number | string): string
 
 	assert(
 		cdn_response.ok,
-		`CDN request aborted: {cdn_response.statusCode} — {cdn_response.statusMessage}: {cdn_response.body}`
+		`(!!) Could not complete 'cdn-request': {cdn_response.statusCode} — {cdn_response.statusMessage}: {cdn_response.body}`
 	)
 
 	-- The response body should now be the contents of the asset file
@@ -105,7 +105,7 @@ function module.upload(assetId: number | string, contents: string): ()
 	})
 
 	local csrf_token = csrf_response.headers["x-csrf-token"]
-	assert(csrf_token, "CSRF request aborted — could not fetch CSRF token.")
+	assert(csrf_token, "(!!) Could not fetch 'x-csrf-token'.")
 
 	-- Upload the asset to Roblox
 	local upload_headers = {
@@ -126,7 +126,7 @@ function module.upload(assetId: number | string, contents: string): ()
 	-- Make sure it uploaded properly
 	assert(
 		upload_response.ok,
-		`Upload request aborted: {upload_response.statusCode} — {upload_response.statusMessage}: {upload_response.body}`
+		`(!!) Could not complete 'upload-request': {upload_response.statusCode} — {upload_response.statusMessage}: {upload_response.body}`
 	)
 end
 

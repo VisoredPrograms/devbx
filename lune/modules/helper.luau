@@ -11,11 +11,11 @@ function module.spawn(program: string, params: { string }, options: process.Exec
 	local response = process.exec(program, params, options)
 
 	if response.stderr and response.stderr ~= "" then
-		warn(response.stderr)
+		warn(`(!!) Could not execute '{program}' (type: 'process'): {response.stderr}`)
 	end
 
 	if response.stdout and response.stdout ~= "" then
-		print(response.stdout)
+		print(`(!) Could not execute '{program}' (type: 'process'): {response.stdout}`)
 	end
 
 	return response
