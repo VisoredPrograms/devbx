@@ -75,8 +75,6 @@ local function write(object: any, base: string): ()
 		fs.writeDir(`{base}/{object.Name}`)
 	end
 
-	print(file)
-
 	fs.writeFile(file, object.Source)
 
 	if has then
