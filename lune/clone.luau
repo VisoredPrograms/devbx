@@ -9,6 +9,14 @@ local models = require("./deps/models")
 
 -- Helpers
 
+-- Replaces only invalid filesystem characters in names, not path separators.
+local function sanitize(name: string): string
+	local str = tostring(name)
+	str = str:gsub("%s+", "_") -- Replace all whitespace characters with underscore
+	str = str:gsub('[:<>"\\|%?%*]', "") -- Remove invalid symbols completely
+	return str
+end
+
 -- Returns all "$path" strings found recursively in the given tree.
 local function paths(tree: any): { string }
 	local list = {}
@@ -42,50 +50,46 @@ local function mkdirs(dirs: { string }): ()
 	end
 end
 
+-- Returns the full path of a Roblox instance from the root to the object.
+local function getPath(object: Instance): string
+	local path = {}
+
+	while object.Parent and object ~= game do
+		table.insert(path, 1, object.Name)
+		object = object.Parent
+	end
+
+	return "./src/" .. table.concat(path, "/")
+end
+
 -- Returns a string representing the script type of the given Roblox object.
 local function getType(object: Instance): (string, boolean)
 	if object:IsA("Script") then
-		return "", true
+		return "server", true
 	elseif object:IsA("ModuleScript") then
-		return ".client", true
+		return "shared", true
 	elseif object:IsA("LocalScript") then
-		return ".server", true
+		return "client", true
 	else
-		return ".unknown", false
+		return "unknown", false
 	end
 end
 
 -- Writes a script to disk, nesting if it has script children.
-local function write(object: any, base: string): ()
-	local has = false
+local function write(object: any): ()
+	local path = getPath(object)
 	local tag, isScript = getType(object)
 
-	for _, child in object:GetChildren() do
-		tag, isScript = getType(object)
-
-		if isScript then
-			has = true
-			break
-		end
+	if not isScript then
+		return
 	end
 
-	local file = has and `{base}/{object.Name}/init.luau` or `{base}/{object.Name}{tag}.luau`
+	path = sanitize(path)
+	fs.writeDir(path)
 
-	if has then
-		fs.writeDir(`{base}/{object.Name}`)
-	end
-
+	local file = `{path}.{tag}.luau`
+	print(file)
 	fs.writeFile(file, object.Source)
-
-	if has then
-		for _, child in object:GetChildren() do
-			tag, isScript = getType(child)
-
-			if isScript then
-				write(child, `{base}/{object.Name}`)
-			end
-		end
-	end
 end
 
 -- Traverses the JSON tree, exporting scripts for each matched service.
@@ -99,15 +103,12 @@ local function walk(tree: any, root: any, parent: any): ()
 		local path = node["$path"]
 		local instance = parent and parent:FindFirstChildOfClass(class) or root:FindFirstChildOfClass(class)
 
-		if not instance or not path then
-			continue
-		end
-
-		for _, object in instance:GetDescendants() do
-			local _, isScript = getType(object)
-
-			if isScript then
-				write(object, path)
+		if instance and path then
+			for _, object in instance:GetDescendants() do
+				local _, isScript = getType(object)
+				if isScript then
+					write(object)
+				end
 			end
 		end
 
@@ -123,9 +124,9 @@ local function dump(id: number | string): ()
 	local place = roblox.deserializePlace(raw)
 
 	local json = fs.readFile("./default.project.json")
-	local proj = serde.decode("json", json)
+	local project = serde.decode("json", json)
 
-	walk(proj.tree, place, nil)
+	walk(project.tree, place, nil)
 end
 
 -- Creates folders, dumps scripts, and builds the project output.
@@ -143,7 +144,7 @@ local function init(name): ()
 	dump(env.PLACE_ID)
 
 	helper.spawn("rojo", { "sourcemap", "-o", "./sourcemap.json", "--include-non-scripts", "default.project.json" })
-	helper.spawn("rojo", { "build", "--output", `./{name}.rbxl`, "default.project.json" })
+	helper.spawn("rojo", { "build", "-o", `./{name}.rbxl`, "default.project.json" })
 end
 
 -- Main execution

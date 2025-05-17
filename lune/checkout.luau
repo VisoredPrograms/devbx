@@ -18,5 +18,5 @@ assert(isFile, "(!!) Could not find 'game' (expected type: place)")
 print("(!) Processing 'game'. Stay patient.")
 
 local command = roblox.studioApplicationPath() -- (process.os == "windows") and "explorer" or "open"
-helper.spawn(command, { `./{placeName}.rbxl` })
 helper.spawn("rojo", { "serve" }, { stdio = "forward" })
+helper.spawn(command, { `./{placeName}.rbxl` })
