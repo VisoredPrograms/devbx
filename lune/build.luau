@@ -4,8 +4,8 @@ local serde = require("@lune/serde")
 local roblox = require("@lune/roblox")
 
 -- Dependencies
-local helper = require("./lune/deps/helper")
-local models = require("./lune/deps/models")
+local helper = require("./deps/helper")
+local models = require("./deps/models")
 
 -- Helpers
 
