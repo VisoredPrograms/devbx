@@ -88,7 +88,6 @@ local function write(object: any): ()
 	fs.writeDir(path)
 
 	local file = `{path}.{tag}.luau`
-	print(file)
 	fs.writeFile(file, object.Source)
 end
 
