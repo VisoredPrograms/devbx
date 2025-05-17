@@ -20,7 +20,7 @@ end
 local function paths(tree: any): { string }
 	local list = {}
 
-	for _, node in pairs(tree) do
+	for idx, node in pairs(tree) do
 		if type(node) ~= "table" then
 			continue
 		end
@@ -39,9 +39,9 @@ end
 
 -- Creates directories if they don’t already exist.
 local function mkdirs(dirs: { string }): ()
-	for _, dir in ipairs(dirs) do
+	for idx, dir in ipairs(dirs) do
 		if fs.isDir(dir) then
-			warn("(!!) devbx: could not over-write existing directory, '" .. dir .. "' (type: folder)")
+			-- warn("(!!) devbx: could not over-write existing directory, '" .. dir .. "' (type: folder)")
 			continue
 		end
 
@@ -76,41 +76,63 @@ end
 
 -- Writes a script to disk, nesting if it has script children.
 local function write(object: any): ()
-	local path = getPath(object)
 	local tag, isScript = getType(object)
 
 	if not isScript then
 		return
 	end
 
+	local path = getPath(object)
 	path = sanitize(path)
-	fs.writeDir(path)
 
-	local file = `{path}.{tag}.luau`
-	fs.writeFile(file, object.Source)
+	local products = {} -- Check if this script has any descendant scripts
+
+	for idx, instance in object:GetChildren() do
+		local _, instanceScript = getType(instance)
+		if instanceScript then
+			table.insert(products, instance)
+			break
+		end
+	end
+
+	if #products < 0 then
+		if not fs.isDir(path) then
+			fs.writeDir(path)
+		end
+
+		path = sanitize(`{path}/init.luau`) -- If it has script children, create a folder with `init.luau`
+	else
+		local dir = path:match("^(.*)/") or "."
+		if not fs.isDir(dir) then
+			fs.writeDir(dir)
+		end
+
+		path = sanitize(`{path}.{tag}.luau`) -- If no script children, save directly as `ScriptName.tag.luau`
+	end
+
+	fs.writeFile(path, object.Source)
+
+	for _, product in products do
+		write(product) -- Recursively export child scripts (if any)
+	end
 end
 
 -- Traverses the JSON tree, exporting scripts for each matched service.
-local function walk(tree: any, root: any, parent: any): ()
-	for _, node in pairs(tree) do
+local function walk(tree: any, root: any): ()
+	for idx, node in pairs(tree) do
 		if type(node) ~= "table" or not node["$className"] then
 			continue
 		end
 
 		local class = node["$className"]
 		local path = node["$path"]
-		local instance = parent and parent:FindFirstChildOfClass(class) or root:FindFirstChildOfClass(class)
+		local instance = root:FindFirstChildOfClass(class)
 
 		if instance and path then
 			for _, object in instance:GetDescendants() do
-				local _, isScript = getType(object)
-				if isScript then
-					write(object)
-				end
+				write(object)
 			end
 		end
-
-		walk(node, root, instance)
 	end
 end
 
@@ -124,7 +146,7 @@ local function dump(id: number | string): ()
 	local json = fs.readFile("./default.project.json")
 	local project = serde.decode("json", json)
 
-	walk(project.tree, place, nil)
+	walk(project.tree, place)
 end
 
 -- Creates folders, dumps scripts, and builds the project output.
