@@ -11,11 +11,11 @@ function module.spawn(program: string, params: { string }, options: process.Exec
 	local response = process.exec(program, params, options)
 
 	if response.stderr and response.stderr ~= "" then
-		warn(`(!!) Could not execute '{program}' (expected type: 'process'): {response.stderr}`)
+		warn(`(!!) devbx: could not execute '{program}' (expected type: 'process'): {response.stderr}`)
 	end
 
 	if response.stdout and response.stdout ~= "" then
-		print(`(!) Could not execute '{program}' (expected type: 'process'): {response.stdout}`)
+		print(`(!) devbx: could not execute '{program}' (expected type: 'process'): {response.stdout}`)
 	end
 
 	return response

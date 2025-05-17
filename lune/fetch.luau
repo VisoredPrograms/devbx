@@ -4,8 +4,7 @@ local serde = require("@lune/serde")
 local roblox = require("@lune/roblox")
 
 -- Dependencies
-local helper = require("./deps/helper")
-local models = require("./deps/models")
+local models = require("./modules/models")
 
 -- Helpers
 
@@ -42,7 +41,7 @@ end
 local function mkdirs(dirs: { string }): ()
 	for _, dir in ipairs(dirs) do
 		if fs.isDir(dir) then
-			-- warn(`(!!) Could not over-write existing directory, '{dir}' (type: folder)`)
+			warn("(!!) devbx: could not over-write existing directory, '" .. dir .. "' (type: folder)")
 			continue
 		end
 
@@ -130,21 +129,25 @@ end
 
 -- Creates folders, dumps scripts, and builds the project output.
 local function init(name): ()
-	local env = serde.decode("toml", fs.readFile("./.env"))
-	assert(env.PLACE_ID, "(!!) Could not find 'place-id' in environment variables (expected type: string)")
+	-- Read environment variables
+	local toml = fs.readFile("./.env")
+	local env = serde.decode("toml", toml)
+	assert(env.PLACE_ID, "(!!) devbx: could not find 'place-id' in environment variables (expected type: string)")
 
+	-- Read project configuration
 	local file = fs.readFile("./default.project.json")
-	local data = serde.decode("json", file)
+	local project = serde.decode("json", file)
+	local tree = project.tree
+	assert(tree, "(!!) devbx: could not find 'tree' in json (expected type: table)")
 
-	local dirs = paths(data.tree)
+	local dirs = paths(tree)
 	table.insert(dirs, 1, "./src")
 
 	mkdirs(dirs)
 	dump(env.PLACE_ID)
-
-	helper.spawn("rojo", { "sourcemap", "-o", "./sourcemap.json", "--include-non-scripts", "default.project.json" })
-	helper.spawn("rojo", { "build", "-o", `./{name}.rbxl`, "default.project.json" })
 end
 
 -- Main execution
+print("(!) devbx: checking Roblox place file for remote updates")
 init("game")
+print("(!) devbx: update check complete — latest place file metadata retrieved")

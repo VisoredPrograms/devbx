@@ -30,7 +30,7 @@ function module.getCookie(): string
 		end
 	end
 
-	error("(!!) Could not find 'auth-cookie' in workspace (expected type: string)")
+	error("(!!) devbx: could not find 'auth-cookie' in workspace (expected type: string)")
 end
 
 -- Main Functions
@@ -52,20 +52,20 @@ function module.copy(assetId: number | string): string
 
 	assert(
 		api_response.ok,
-		`(!!) Could not complete 'api-request': {api_response.statusCode} — {api_response.statusMessage}: {api_response.body}`
+		`(!!) devbx: could not complete 'api-request': {api_response.statusCode} — {api_response.statusMessage}: {api_response.body}`
 	)
 
 	-- Make sure we got a valid response body
 	local content = serde.decode("json", api_response.body)
 	if type(content) ~= "table" or type(content.locations) ~= "table" then
-		error("(!!) Could not fetch a valid 'response-body' (expected type: table).")
+		error("(!!) devbx: could not fetch a valid 'response-body' (expected type: table).")
 	end
 
 	-- Grab the first asset download location - we only
 	-- requested one in our query, so this will be correct
 	local path = content.locations[1]
 	if type(path) ~= "table" or type(path.location) ~= "string" then
-		error("(!!) Could not find any suitable paths (expected type: table)")
+		error("(!!) devbx: could not find any suitable paths (expected type: table)")
 	end
 
 	-- Fetch the place contents from the CDN
@@ -78,7 +78,7 @@ function module.copy(assetId: number | string): string
 
 	assert(
 		cdn_response.ok,
-		`(!!) Could not complete 'cdn-request': {cdn_response.statusCode} — {cdn_response.statusMessage}: {cdn_response.body}`
+		`(!!) devbx: could not complete 'cdn-request': {cdn_response.statusCode} — {cdn_response.statusMessage}: {cdn_response.body}`
 	)
 
 	-- The response body should now be the contents of the asset file
@@ -105,7 +105,7 @@ function module.sync(assetId: number | string, contents: string): ()
 	})
 
 	local csrf_token = csrf_response.headers["x-csrf-token"]
-	assert(csrf_token, "(!!) Could not fetch 'x-csrf-token'.")
+	assert(csrf_token, "(!!) devbx: could not fetch 'x-csrf-token'.")
 
 	-- Upload the asset to Roblox
 	local upload_headers = {
@@ -126,7 +126,7 @@ function module.sync(assetId: number | string, contents: string): ()
 	-- Make sure it uploaded properly
 	assert(
 		upload_response.ok,
-		`(!!) Could not complete 'upload-request': {upload_response.statusCode} — {upload_response.statusMessage}: {upload_response.body}`
+		`(!!) devbx: could not complete 'upload-request': {upload_response.statusCode} — {upload_response.statusMessage}: {upload_response.body}`
 	)
 end
 
