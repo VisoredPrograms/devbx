@@ -45,13 +45,13 @@ end
 -- Returns a string representing the script type of the given Roblox object.
 local function getType(object: Instance): (string, boolean)
 	if object:IsA("Script") then
-		return "module", true
+		return "", true
 	elseif object:IsA("ModuleScript") then
-		return "client", true
+		return ".client", true
 	elseif object:IsA("LocalScript") then
-		return "server", true
+		return ".server", true
 	else
-		return "", false
+		return ".unknown", false
 	end
 end
 
@@ -61,17 +61,21 @@ local function write(object: any, base: string): ()
 	local tag, isScript = getType(object)
 
 	for _, child in object:GetChildren() do
+		tag, isScript = getType(object)
+
 		if isScript then
 			has = true
 			break
 		end
 	end
 
-	local file = has and `{base}/{object.Name}/init.luau` or `{base}/{object.Name}.{tag}.luau`
+	local file = has and `{base}/{object.Name}/init.luau` or `{base}/{object.Name}{tag}.luau`
 
 	if has then
 		fs.writeDir(`{base}/{object.Name}`)
 	end
+
+	print(file)
 
 	fs.writeFile(file, object.Source)
 
@@ -80,7 +84,7 @@ local function write(object: any, base: string): ()
 			tag, isScript = getType(child)
 
 			if isScript then
-				write(child, `{base}/{object.Name}.{tag}`)
+				write(child, `{base}/{object.Name}`)
 			end
 		end
 	end
@@ -102,7 +106,9 @@ local function walk(tree: any, root: any, parent: any): ()
 		end
 
 		for _, object in instance:GetDescendants() do
-			if object:IsA("Script") or object:IsA("ModuleScript") or object:IsA("LocalScript") then
+			local _, isScript = getType(object)
+
+			if isScript then
 				write(object, path)
 			end
 		end
