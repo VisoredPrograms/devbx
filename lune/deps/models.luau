@@ -36,7 +36,7 @@ end
 -- Main Functions
 
 -- Downloads an asset by ID and returns its contents.
-function module.download(assetId: number | string): string
+function module.copy(assetId: number | string): string
 	-- Try to find the auth cookie for the current user
 	local cookie = module.getCookie()
 
@@ -86,7 +86,7 @@ function module.download(assetId: number | string): string
 end
 
 -- Uploads asset contents to Roblox by asset ID.
-function module.upload(assetId: number | string, contents: string): ()
+function module.sync(assetId: number | string, contents: string): ()
 	-- Try to find the auth cookie for the current user
 	local cookie = module.getCookie()
 

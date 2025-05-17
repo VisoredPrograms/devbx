@@ -4,10 +4,10 @@ local module = {}
 local process = require("@lune/process")
 
 -- Constants
-local SPAWN_OPTIONS: process.ExecOptions? = {} -- { shell = "powershell", stdio = "forward" }
+local spawn_options: process.ExecOptions? = { stdio = "forward" } -- { shell = "powershell", stdio = "forward" }
 
 function module.spawn(program: string, params: { string }, options: process.ExecOptions?): { [string]: any }
-	options = options or SPAWN_OPTIONS
+	options = options or spawn_options
 	local response = process.exec(program, params, options)
 
 	if response.stderr and response.stderr ~= "" then

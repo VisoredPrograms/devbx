@@ -3,8 +3,10 @@ local fs = require("@lune/fs")
 local roblox = require("@lune/roblox")
 local serde = require("@lune/serde")
 
+-- Dependencies
+local helper = require("./deps/helper")
+
 -- References
-local helper = require("./modules/helper")
 local env = serde.decode("toml", fs.readFile("./.env"))
 local placeName = env.OUTPUT_NAME or "game"
 
