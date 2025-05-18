@@ -66,7 +66,7 @@ local function getType(object: Instance): (string, boolean)
 	if object:IsA("Script") then
 		return "server", true
 	elseif object:IsA("ModuleScript") then
-		return "shared", true
+		return "", true
 	elseif object:IsA("LocalScript") then
 		return "client", true
 	else
